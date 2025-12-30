@@ -1,0 +1,9 @@
+{
+  "fatal": false,
+  "anr": false,
+  "processDied": false,
+  "mentionsApp": true,
+  "crashed": false,
+  "pidBefore": "31988",
+  "pidAfter": "31988"
+}
