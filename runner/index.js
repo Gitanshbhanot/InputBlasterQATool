@@ -24,7 +24,12 @@ const SWIGGY_ACTIVITY = "in.swiggy.android/.HomeIcon";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash"; // per docs
 
-// ---------- ADB helper ----------
+/**
+ * Executes an ADB command synchronously.
+ * @param {string[]} args - The arguments for the adb command.
+ * @returns {string} - The trimmed stdout from the command.
+ * @throws {Error} - If the command fails or adb is not found.
+ */
 function adb(args) {
   const r = spawnSync(ADB_BIN, args, { encoding: "utf-8" });
   if (r.error) throw new Error(`adb spawn error: ${r.error.message}`);
@@ -146,6 +151,13 @@ function pidof(appId) {
   }
 }
 
+/**
+ * Detects if a crash occurred based on logcat content and process state.
+ * @param {string} logText - The logcat content.
+ * @param {string} appId - The application package ID.
+ * @param {string} pidBefore - PID before the test step.
+ * @param {string} pidAfter - PID after the test step.
+ */
 function detectCrash(logText, appId, pidBefore, pidAfter) {
   // strict Java crash marker
   const hasFatal = /FATAL EXCEPTION/.test(logText);
@@ -171,7 +183,7 @@ function detectCrash(logText, appId, pidBefore, pidAfter) {
     fatal: hasFatal && hasProcessLine,
     anr: hasAnr,
     processDied: died || restarted,
-    mentionsApp: hasProcessLine, // stop using includes(appId)
+    mentionsApp: hasProcessLine,
     crashed,
     pidBefore,
     pidAfter,
