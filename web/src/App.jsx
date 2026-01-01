@@ -175,6 +175,93 @@ function CodeBlock({ children }) {
   );
 }
 
+const STYLES = {
+  container: {
+    minHeight: "100vh",
+    background: "#f6f7fb",
+    padding: 24,
+    fontFamily:
+      "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+  },
+  headerContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+    marginBottom: 16,
+  },
+  title: { fontSize: 22, fontWeight: 1000, color: "#111827" },
+  subtitle: { fontSize: 13, color: "#6b7280", lineHeight: 1.4 },
+  infoBox: {
+    background: "#ecfeff",
+    border: "1px solid #a5f3fc",
+    padding: 12,
+    borderRadius: 12,
+    color: "#155e75",
+    fontSize: 13,
+    lineHeight: 1.4,
+    marginBottom: 16,
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+    gap: 16,
+  },
+  inputGroup: { display: "grid", gap: 6 },
+  label: { fontSize: 12, fontWeight: 900, color: "#374151" },
+  mutationPreview: {
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    background: "#f9fafb",
+    padding: 12,
+    fontSize: 13,
+    color: "#111827",
+    lineHeight: 1.4,
+    wordBreak: "break-word",
+  },
+  errorBox: {
+    marginTop: 12,
+    background: "#fef2f2",
+    border: "1px solid #fecaca",
+    padding: 12,
+    borderRadius: 12,
+    color: "#991b1b",
+    whiteSpace: "pre-wrap",
+    fontSize: 13,
+  },
+  successBox: (isCrash) => ({
+    marginTop: 12,
+    background: isCrash ? "#fef2f2" : "#ecfdf5",
+    border: `1px solid ${isCrash ? "#fecaca" : "#a7f3d0"}`,
+    padding: 12,
+    borderRadius: 12,
+    color: isCrash ? "#991b1b" : "#065f46",
+    fontSize: 13,
+    lineHeight: 1.4,
+  }),
+  tableContainer: {
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  tableHeader: {
+    display: "grid",
+    gridTemplateColumns: "220px 110px 1fr",
+    background: "#f9fafb",
+    padding: 10,
+    fontWeight: 900,
+    fontSize: 12,
+  },
+  tableRow: {
+    display: "grid",
+    gridTemplateColumns: "220px 110px 1fr",
+    padding: 10,
+    borderTop: "1px solid #eef2f7",
+    fontSize: 12,
+    gap: 8,
+  },
+};
+
 export default function App() {
   const [appId, setAppId] = useState("in.swiggy.android");
   const [locale] = useState("en-US"); // kept for schema consistency
@@ -240,9 +327,13 @@ export default function App() {
   const [generating, setGenerating] = useState(false);
 
   async function refreshRuns() {
-    const r = await fetch("http://localhost:4545/runs");
-    const j = await r.json();
-    if (j.ok) setRuns(j.runs || []);
+    try {
+      const r = await fetch("http://localhost:4545/runs");
+      const j = await r.json();
+      if (j.ok) setRuns(j.runs || []);
+    } catch (e) {
+      console.warn("Could not refresh runs:", e);
+    }
   }
 
   async function run() {
@@ -296,31 +387,14 @@ export default function App() {
     : "gray";
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f6f7fb",
-        padding: 24,
-        fontFamily:
-          "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
-      }}
-    >
+    <div style={STYLES.container}>
       <div
         style={{ width: "100%", margin: "0 auto", display: "grid", gap: 16 }}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={STYLES.headerContainer}>
           <div style={{ display: "grid", gap: 6 }}>
-            <div style={{ fontSize: 22, fontWeight: 1000, color: "#111827" }}>
-              Input Mutation Studio (Swiggy)
-            </div>
-            <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.4 }}>
+            <div style={STYLES.title}>Input Mutation Studio (Swiggy)</div>
+            <div style={STYLES.subtitle}>
               Goal → testcase JSON (Gemini) → selector-based replay (UIAutomator
               dump) → crash evidence (logcat).
             </div>
@@ -335,38 +409,18 @@ export default function App() {
           </div>
         </div>
 
-        <div
-          style={{
-            background: "#ecfeff",
-            border: "1px solid #a5f3fc",
-            padding: 12,
-            borderRadius: 12,
-            color: "#155e75",
-            fontSize: 13,
-            lineHeight: 1.4,
-          }}
-        >
+        <div style={STYLES.infoBox}>
           <b>Gemini mode:</b> Use Goal → Generate testcase. The runner will use
           UIAutomator dumps to locate elements by text/resource-id (no X/Y
           needed).
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
-            gap: 16,
-          }}
-        >
+        <div style={STYLES.grid}>
           <div style={{ display: "grid", gap: 16, minWidth: 0 }}>
             <Card title="Configuration">
               <div style={{ display: "grid", gap: 12 }}>
-                <div style={{ display: "grid", gap: 6 }}>
-                  <div
-                    style={{ fontSize: 12, fontWeight: 900, color: "#374151" }}
-                  >
-                    App package
-                  </div>
+                <div style={STYLES.inputGroup}>
+                  <div style={STYLES.label}>App package</div>
                   <Input
                     value={appId}
                     style={{ width: "96%" }}
@@ -381,16 +435,8 @@ export default function App() {
                     gap: 12,
                   }}
                 >
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 900,
-                        color: "#374151",
-                      }}
-                    >
-                      Field type
-                    </div>
+                  <div style={STYLES.inputGroup}>
+                    <div style={STYLES.label}>Field type</div>
                     <Select
                       value={fieldType}
                       onChange={(e) => setFieldType(e.target.value)}
@@ -400,16 +446,8 @@ export default function App() {
                     </Select>
                   </div>
 
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 900,
-                        color: "#374151",
-                      }}
-                    >
-                      Mutation type
-                    </div>
+                  <div style={STYLES.inputGroup}>
+                    <div style={STYLES.label}>Mutation type</div>
                     <Select
                       value={kind}
                       onChange={(e) => setKind(e.target.value)}
@@ -424,37 +462,16 @@ export default function App() {
                   </div>
                 </div>
 
-                <div style={{ display: "grid", gap: 6 }}>
-                  <div
-                    style={{ fontSize: 12, fontWeight: 900, color: "#374151" }}
-                  >
-                    Generated mutation
-                  </div>
-                  <div
-                    style={{
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 12,
-                      background: "#f9fafb",
-                      padding: 12,
-                      fontSize: 13,
-                      color: "#111827",
-                      lineHeight: 1.4,
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {mutationText}
-                  </div>
+                <div style={STYLES.inputGroup}>
+                  <div style={STYLES.label}>Generated mutation</div>
+                  <div style={STYLES.mutationPreview}>{mutationText}</div>
                 </div>
               </div>
             </Card>
 
             <Card title="Goal → Generate testcase">
               <div style={{ display: "grid", gap: 10 }}>
-                <div
-                  style={{ fontSize: 12, fontWeight: 900, color: "#374151" }}
-                >
-                  Goal (natural language)
-                </div>
+                <div style={STYLES.label}>Goal (natural language)</div>
                 <textarea
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
@@ -508,40 +525,14 @@ export default function App() {
               </div>
 
               {err ? (
-                <div
-                  style={{
-                    marginTop: 12,
-                    background: "#fef2f2",
-                    border: "1px solid #fecaca",
-                    padding: 12,
-                    borderRadius: 12,
-                    color: "#991b1b",
-                    whiteSpace: "pre-wrap",
-                    fontSize: 13,
-                  }}
-                >
+                <div style={STYLES.errorBox}>
                   <b>Error</b>
                   <div style={{ marginTop: 6 }}>{err}</div>
                 </div>
               ) : null}
 
               {runResult ? (
-                <div
-                  style={{
-                    marginTop: 12,
-                    background: runResult.crash?.crashed
-                      ? "#fef2f2"
-                      : "#ecfdf5",
-                    border: `1px solid ${
-                      runResult.crash?.crashed ? "#fecaca" : "#a7f3d0"
-                    }`,
-                    padding: 12,
-                    borderRadius: 12,
-                    color: runResult.crash?.crashed ? "#991b1b" : "#065f46",
-                    fontSize: 13,
-                    lineHeight: 1.4,
-                  }}
-                >
+                <div style={STYLES.successBox(runResult.crash?.crashed)}>
                   <b>Run OK</b>
                   <div style={{ marginTop: 6, display: "grid", gap: 4 }}>
                     <div>Crash: {runResult.crash?.crashed ? "YES" : "NO"}</div>
@@ -567,39 +558,14 @@ export default function App() {
             </Card>
 
             <Card title="Recent runs (last 10)">
-              <div
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "220px 110px 1fr",
-                    background: "#f9fafb",
-                    padding: 10,
-                    fontWeight: 900,
-                    fontSize: 12,
-                  }}
-                >
+              <div style={STYLES.tableContainer}>
+                <div style={STYLES.tableHeader}>
                   <div>Run</div>
                   <div>Crash</div>
                   <div>Meta</div>
                 </div>
                 {runs.slice(0, 10).map((r) => (
-                  <div
-                    key={r.id}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "220px 110px 1fr",
-                      padding: 10,
-                      borderTop: "1px solid #eef2f7",
-                      fontSize: 12,
-                      gap: 8,
-                    }}
-                  >
+                  <div key={r.id} style={STYLES.tableRow}>
                     <div style={{ fontFamily: "monospace" }}>{r.id}</div>
                     <div
                       style={{
@@ -672,31 +638,15 @@ export default function App() {
                     gap: 12,
                   }}
                 >
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 900,
-                        color: "#374151",
-                      }}
-                    >
-                      Tap X
-                    </div>
+                  <div style={STYLES.inputGroup}>
+                    <div style={STYLES.label}>Tap X</div>
                     <Input
                       value={tapX}
                       onChange={(e) => setTapX(e.target.value)}
                     />
                   </div>
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 900,
-                        color: "#374151",
-                      }}
-                    >
-                      Tap Y
-                    </div>
+                  <div style={STYLES.inputGroup}>
+                    <div style={STYLES.label}>Tap Y</div>
                     <Input
                       value={tapY}
                       onChange={(e) => setTapY(e.target.value)}
