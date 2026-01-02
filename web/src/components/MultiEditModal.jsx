@@ -331,17 +331,23 @@ export default function EdgeCaseReviewModal({
       aria-describedby="edgecase-review-description"
       PaperProps={{
         className:
-          "bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 shadow-2xl rounded-3xl overflow-hidden",
+          "bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-[32px] overflow-hidden",
         style: {
-          borderRadius: "24px",
+          borderRadius: "32px",
+          boxShadow: "none", // Using tailwind shadow instead to avoid MUI conflict
+        },
+      }}
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: "32px",
         },
       }}
     >
       {/* Header Section */}
-      <div className="relative px-6 py-5 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-b from-slate-50/50 to-transparent dark:from-slate-900/50 dark:to-transparent">
+      <div className="relative px-6 py-6 border-b border-slate-100 dark:border-slate-900 bg-white dark:bg-slate-950">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
               Edge-case Review
             </h2>
             <div className="mt-1 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
@@ -384,8 +390,7 @@ export default function EdgeCaseReviewModal({
                 aria-label="Close modal"
                 onClick={handleClose}
                 size="small"
-                className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                sx={{ color: "text.secondary" }}
+                color="info"
               >
                 <CloseIcon fontSize="small" />
               </IconButton>
@@ -543,13 +548,11 @@ export default function EdgeCaseReviewModal({
                                 newValue={diffNew}
                                 splitView={view === "sideBySide"}
                                 showDiffOnly={false}
-                                useDarkTheme={
-                                  theme.palette.mode === "dark" || true
-                                } // Enforcing dark theme for better looks
+                                useDarkTheme={theme.palette.mode === "dark"}
                                 styles={{
                                   variables: {
                                     dark: {
-                                      diffViewerBackground: "transparent",
+                                      diffViewerBackground: "#020617",
                                       diffViewerColor: "#cbd5e1",
                                       addedBackground: "rgba(34,197,94,0.15)",
                                       addedColor: "#cbd5e1",
@@ -559,10 +562,26 @@ export default function EdgeCaseReviewModal({
                                         "rgba(34,197,94,0.25)",
                                       wordRemovedBackground:
                                         "rgba(239,68,68,0.25)",
-                                      lineNumberColor: "#64748b",
+                                      lineNumberColor: "#475569",
                                       lineNumberBackground: "transparent",
                                       gutterBackground: "transparent",
                                       gutterColor: "#475569",
+                                    },
+                                    light: {
+                                      diffViewerBackground: "#ffffff",
+                                      diffViewerColor: "#1e293b",
+                                      addedBackground: "rgba(34,197,94,0.1)",
+                                      addedColor: "#1e293b",
+                                      removedBackground: "rgba(239,68,68,0.08)",
+                                      removedColor: "#1e293b",
+                                      wordAddedBackground:
+                                        "rgba(34,197,94,0.2)",
+                                      wordRemovedBackground:
+                                        "rgba(239,68,68,0.15)",
+                                      lineNumberColor: "#94a3b8",
+                                      lineNumberBackground: "#f8fafc",
+                                      gutterBackground: "#f8fafc",
+                                      gutterColor: "#94a3b8",
                                     },
                                   },
                                   contentText: {
@@ -600,7 +619,7 @@ export default function EdgeCaseReviewModal({
                     <path d="M12 8h.01" />
                   </svg>
                 </div>
-                <p className="text-[11px] text-blue-700 dark:text-blue-300 leading-snug">
+                <p className="text-[11px] text-blue-700 dark:text-blue-500 leading-snug">
                   <span className="font-bold">Pro Tip:</span> Accept will
                   replace the original steps with AI-suggested edge cases.
                   Reject will keep the original file content and move to the
@@ -615,10 +634,10 @@ export default function EdgeCaseReviewModal({
       {hasFiles && phase !== "complete" && (
         <div className="px-6 py-4 flex items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
           <div className="hidden sm:block">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-white">
               Action Required
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500 dark:text-white">
               {phase === "loadingNext"
                 ? "Preparing next item..."
                 : "Decide for this file"}
