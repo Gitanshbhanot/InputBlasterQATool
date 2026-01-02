@@ -1,5 +1,7 @@
 // web/src/App.jsx
 import { useMemo, useState } from "react";
+import EdgeCaseReviewModal from "./components/MultiEditModal";
+import { Button as ButtonBase } from "@mui/material";
 
 function generateMutation(kind) {
   switch (kind) {
@@ -325,6 +327,7 @@ export default function App() {
   const [err, setErr] = useState("");
   const [runs, setRuns] = useState([]);
   const [generating, setGenerating] = useState(false);
+  const [openEdgeCaseReviewModal, setOpenEdgeCaseReviewModal] = useState(false);
 
   async function refreshRuns() {
     try {
@@ -471,7 +474,17 @@ export default function App() {
 
             <Card title="Goal → Generate testcase">
               <div style={{ display: "grid", gap: 10 }}>
-                <div style={STYLES.label}>Goal (natural language)</div>
+                <div className="flex justify-between items-center gap-2">
+                  <div style={STYLES.label}>Goal (natural language)</div>
+                  <ButtonBase
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setOpenEdgeCaseReviewModal(true)}
+                  >
+                    Review
+                  </ButtonBase>
+                </div>
+
                 <textarea
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
@@ -663,6 +676,10 @@ export default function App() {
           </div>
         </div>
       </div>
+      <EdgeCaseReviewModal
+        open={openEdgeCaseReviewModal}
+        setOpen={setOpenEdgeCaseReviewModal}
+      />
     </div>
   );
 }
